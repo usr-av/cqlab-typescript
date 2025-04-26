@@ -3,6 +3,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
+// Read the package.json from the root directory
+const fs = require('fs');
+const path = require('path');
+const packageJsonPath = path.resolve(__dirname, '../../package.json');
+const rootPackageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/cqlab-ui',

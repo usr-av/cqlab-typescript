@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CQLab TypeScript</title>
+    <title>CQLab TypeScript UI</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -81,75 +84,220 @@
             color: #666;
             padding: 1rem;
         }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4CAF50;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .flow-list {
+            list-style: none;
+            padding: 0;
+        }
+        .flow-item {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .flow-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .flow-item h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .flow-item p {
+            margin: 0.5rem 0;
+        }
+        .flow-item .meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>CQLab TypeScript</h1>
-        </div>
-    </header>
+    <div id="root"></div>
 
-    <div class="container">
-        <div class="card">
-            <h2>Welcome to CQLab TypeScript</h2>
-            <p>This is a temporary UI for the CQLab TypeScript project. The full UI is under development, but the API server is running and can be accessed via the endpoints below.</p>
-        </div>
+    <script type="text/babel">
+        // App component
+        function App() {
+            return (
+                <div>
+                    <Header />
+                    <main className="container">
+                        <Welcome />
+                        <FlowList />
+                        <ApiDocs />
+                    </main>
+                    <Footer />
+                </div>
+            );
+        }
 
-        <h2>API Endpoints</h2>
-        <div class="api-section">
-            <div class="api-card">
-                <h3>Flow Definitions</h3>
-                <p>Manage clinical flow definitions</p>
-                <a href="/api/flows" class="api-link">GET /api/flows</a>
-            </div>
+        // Header component
+        function Header() {
+            return (
+                <header>
+                    <div className="container">
+                        <h1>CQLab TypeScript UI</h1>
+                    </div>
+                </header>
+            );
+        }
 
-            <div class="api-card">
-                <h3>Flow Implementations</h3>
-                <p>Access flow implementations</p>
-                <a href="/api/flow-implementations" class="api-link">Flow Implementations</a>
-            </div>
+        // Welcome component
+        function Welcome() {
+            return (
+                <div className="card">
+                    <h2>Welcome to CQLab TypeScript</h2>
+                    <p>This is a simple React UI for the CQLab TypeScript project. You can use this interface to interact with the API and manage clinical flow definitions.</p>
+                </div>
+            );
+        }
 
-            <div class="api-card">
-                <h3>Flow Instances</h3>
-                <p>Manage flow instances</p>
-                <a href="/api/flow-instances" class="api-link">Flow Instances</a>
-            </div>
+        // FlowList component
+        function FlowList() {
+            const [flows, setFlows] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [error, setError] = React.useState(null);
 
-            <div class="api-card">
-                <h3>Libraries</h3>
-                <p>Access logic libraries</p>
-                <a href="/api/libraries/registry" class="api-link">Libraries Registry</a>
-            </div>
+            React.useEffect(() => {
+                fetch('/api/flows')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch flows');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        setFlows(data);
+                        setLoading(false);
+                    })
+                    .catch(err => {
+                        setError(err.message);
+                        setLoading(false);
+                    });
+            }, []);
 
-            <div class="api-card">
-                <h3>Vocabulary</h3>
-                <p>Access medical vocabularies</p>
-                <a href="/api/vocabulary/value-sets" class="api-link">Value Sets</a>
-                <a href="/api/vocabulary/codes" class="api-link">Codes</a>
-            </div>
+            return (
+                <div className="card">
+                    <h2>Flow Definitions</h2>
+                    {error && <div className="error">{error}</div>}
+                    {loading ? (
+                        <div className="loading">
+                            <div className="spinner"></div>
+                        </div>
+                    ) : (
+                        <ul className="flow-list">
+                            {flows.length === 0 ? (
+                                <p>No flow definitions found. You can create a new one using the API.</p>
+                            ) : (
+                                flows.map(flow => (
+                                    <li key={flow.id} className="flow-item">
+                                        <h3>{flow.bindId || 'Unnamed Flow'}</h3>
+                                        <p className="meta">ID: {flow.id}</p>
+                                        <p className="meta">Created: {new Date(flow.createdAt).toLocaleString()}</p>
+                                    </li>
+                                ))
+                            )}
+                        </ul>
+                    )}
+                </div>
+            );
+        }
 
-            <div class="api-card">
-                <h3>Mock Data</h3>
-                <p>Access mock patient data</p>
-                <a href="/api/mock-data" class="api-link">Mock Data</a>
-            </div>
-        </div>
+        // ApiDocs component
+        function ApiDocs() {
+            return (
+                <div className="card">
+                    <h2>API Documentation</h2>
+                    <div className="api-section">
+                        <div className="api-card">
+                            <h3>Flow Definitions</h3>
+                            <p>Manage clinical flow definitions</p>
+                            <a href="/api/flows" className="api-link" target="_blank">GET /api/flows</a>
+                        </div>
 
-        <div class="card">
-            <h2>API Usage Example</h2>
-            <p>Here's an example of how to use the API with JavaScript:</p>
-            <pre><code>fetch('/api/flows')
+                        <div className="api-card">
+                            <h3>Flow Implementations</h3>
+                            <p>Access flow implementations</p>
+                            <a href="/api/flow-implementations" className="api-link" target="_blank">Flow Implementations</a>
+                        </div>
+
+                        <div className="api-card">
+                            <h3>Flow Instances</h3>
+                            <p>Manage flow instances</p>
+                            <a href="/api/flow-instances" className="api-link" target="_blank">Flow Instances</a>
+                        </div>
+
+                        <div className="api-card">
+                            <h3>Libraries</h3>
+                            <p>Access logic libraries</p>
+                            <a href="/api/libraries/registry" className="api-link" target="_blank">Libraries Registry</a>
+                        </div>
+
+                        <div className="api-card">
+                            <h3>Vocabulary</h3>
+                            <p>Access medical vocabularies</p>
+                            <a href="/api/vocabulary/value-sets" className="api-link" target="_blank">Value Sets</a>
+                            <a href="/api/vocabulary/codes" className="api-link" target="_blank">Codes</a>
+                        </div>
+
+                        <div className="api-card">
+                            <h3>Mock Data</h3>
+                            <p>Access mock patient data</p>
+                            <a href="/api/mock-data" className="api-link" target="_blank">Mock Data</a>
+                        </div>
+                    </div>
+
+                    <div className="card">
+                        <h2>API Usage Example</h2>
+                        <p>Here's an example of how to use the API with JavaScript:</p>
+                        <pre><code>fetch('/api/flows')
   .then(response => response.json())
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));</code></pre>
-        </div>
-    </div>
+                    </div>
+                </div>
+            );
+        }
 
-    <footer>
-        <div class="container">
-            <p>CQLab TypeScript - A clinical quality language implementation in TypeScript</p>
-        </div>
-    </footer>
+        // Footer component
+        function Footer() {
+            return (
+                <footer>
+                    <div className="container">
+                        <p>CQLab TypeScript - A clinical quality language implementation in TypeScript</p>
+                    </div>
+                </footer>
+            );
+        }
+
+        // Render the App component
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
