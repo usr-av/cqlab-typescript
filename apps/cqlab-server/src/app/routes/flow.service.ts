@@ -8,22 +8,27 @@ import { IFlowDefinition } from '@cqlab/cqflow-core';
 @Injectable()
 export class FlowService {
   constructor(
-    @InjectRepository(FlowDefinitionEntity)
-    private flowDefRepo: Repository<FlowDefinitionEntity>
+    // Temporarily commenting out repository injection
+    // @InjectRepository(FlowDefinitionEntity)
+    // private flowDefRepo: Repository<FlowDefinitionEntity>
   ) {}
 
   async getDefinitions(): Promise<FlowDefinitionEntity[]> {
-    return this.flowDefRepo.find({
-      order: {
-        bindId: 'ASC',
-      },
-    });
+    // Temporarily returning mock data
+    return [];
+    // return this.flowDefRepo.find({
+    //   order: {
+    //     bindId: 'ASC',
+    //   },
+    // });
   }
 
   async getDefinitionById(id: string): Promise<FlowDefinitionEntity | null> {
-    return this.flowDefRepo.findOne({
-      where: { id: id },
-    });
+    // Temporarily returning mock data
+    return null;
+    // return this.flowDefRepo.findOne({
+    //   where: { id: id },
+    // });
 
     // return this.prisma.flowDefinition.findFirst({
     //   where: { id: id },
@@ -39,11 +44,19 @@ export class FlowService {
   async createDefinition(
     flowDefinition: IFlowDefinition
   ): Promise<FlowDefinitionEntity> {
+    // Temporarily returning mock data
     const flowDef = new FlowDefinitionEntity();
+    flowDef.id = 'mock-id-' + Date.now();
     flowDef.bindId = flowDefinition.bindId || '';
     flowDef.nodes = flowDefinition.nodes;
-    await this.flowDefRepo.save(flowDef);
+    flowDef.createdAt = new Date().toISOString();
     return flowDef;
+
+    // const flowDef = new FlowDefinitionEntity();
+    // flowDef.bindId = flowDefinition.bindId || '';
+    // flowDef.nodes = flowDefinition.nodes;
+    // await this.flowDefRepo.save(flowDef);
+    // return flowDef;
 
     // return await this.prisma.flowDefinition.create({
     //   data: flowDefinition,
@@ -71,11 +84,19 @@ export class FlowService {
   async updateDefinition(
     flowDefinition: IFlowDefinition
   ): Promise<FlowDefinitionEntity> {
-    return this.flowDefRepo.save({
-      id: flowDefinition.id,
-      bindId: flowDefinition.bindId,
-      nodes: flowDefinition.nodes,
-    });
+    // Temporarily returning mock data
+    const flowDef = new FlowDefinitionEntity();
+    flowDef.id = flowDefinition.id;
+    flowDef.bindId = flowDefinition.bindId || '';
+    flowDef.nodes = flowDefinition.nodes;
+    flowDef.createdAt = new Date().toISOString();
+    return flowDef;
+
+    // return this.flowDefRepo.save({
+    //   id: flowDefinition.id,
+    //   bindId: flowDefinition.bindId,
+    //   nodes: flowDefinition.nodes,
+    // });
 
     // return await this.prisma.flowDefinition.update({
     //   where: {

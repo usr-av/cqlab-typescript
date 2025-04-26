@@ -9,6 +9,7 @@ import {
   IFlowDefinition,
 } from '@cqlab/cqflow-core';
 import { FlowInstanceEntity } from '../models/flow-instance.entity';
+import { FlowDefinitionEntity } from '../models/flow-definition.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FlowService } from './flow.service';
@@ -19,16 +20,19 @@ export class FlowInstanceService {
   constructor(
     private readonly flowService: FlowService,
 
-    @InjectRepository(FlowInstanceEntity)
-    private flowInstanceRepo: Repository<FlowInstanceEntity>
+    // Temporarily commenting out repository injection
+    // @InjectRepository(FlowInstanceEntity)
+    // private flowInstanceRepo: Repository<FlowInstanceEntity>
   ) {}
 
   async getFlowInstancesByFlowDefinitionId(
     flowDefinitionId: string
   ): Promise<FlowInstanceEntity[]> {
-    return this.flowInstanceRepo.find({
-      where: { flowDefinition: { id: flowDefinitionId } },
-    });
+    // Temporarily returning mock data
+    return [];
+    // return this.flowInstanceRepo.find({
+    //   where: { flowDefinition: { id: flowDefinitionId } },
+    // });
   }
 
   async createFlowInstance({
@@ -38,51 +42,70 @@ export class FlowInstanceService {
     flowDefinitionId: string;
     initialData: any;
   }) {
-    const flowDef = await this.flowService.getDefinitionById(flowDefinitionId);
-    if (!flowDef) {
-      throw new HttpException(
-        `FlowDefinition not found with id: ${flowDefinitionId}`,
-        HttpStatus.NOT_FOUND
-      );
-    }
-
+    // Temporarily returning mock data
     const flowInstance = new FlowInstanceEntity();
+    flowInstance.id = 'mock-id';
     flowInstance.answers = [];
-
-    flowInstance.flowDefinition = flowDef;
     flowInstance.initialData = initialData;
     flowInstance.status = CQFlowExecutorStateEnum.Initiated;
     flowInstance.actionsTaken = {};
-    await this.flowInstanceRepo.save(flowInstance);
     return flowInstance;
+
+    // const flowDef = await this.flowService.getDefinitionById(flowDefinitionId);
+    // if (!flowDef) {
+    //   throw new HttpException(
+    //     `FlowDefinition not found with id: ${flowDefinitionId}`,
+    //     HttpStatus.NOT_FOUND
+    //   );
+    // }
+
+    // const flowInstance = new FlowInstanceEntity();
+    // flowInstance.answers = [];
+
+    // flowInstance.flowDefinition = flowDef;
+    // flowInstance.initialData = initialData;
+    // flowInstance.status = CQFlowExecutorStateEnum.Initiated;
+    // flowInstance.actionsTaken = {};
+    // await this.flowInstanceRepo.save(flowInstance);
+    // return flowInstance;
   }
 
   async getFlowInstanceActiveSteps(flowInstanceId: string) {
-    const flowInstance = await this.flowInstanceRepo.findOne({
-      where: { id: flowInstanceId },
-      relations: {
-        flowDefinition: true,
-      },
-    });
+    // Temporarily returning mock data
+    const flowInstance = new FlowInstanceEntity();
+    flowInstance.id = flowInstanceId;
+    flowInstance.answers = [];
+    flowInstance.initialData = {};
+    flowInstance.status = CQFlowExecutorStateEnum.Initiated;
+    flowInstance.actionsTaken = {};
 
-    // const flowDefinition = findFlowDefinitionByBindId(flowInstance.flowId);
+    // const flowInstance = await this.flowInstanceRepo.findOne({
+    //   where: { id: flowInstanceId },
+    //   relations: {
+    //     flowDefinition: true,
+    //   },
+    // });
 
-    if (!flowInstance) {
-      throw new HttpException(
-        `Unable to find flowInstance by id: ${flowInstanceId}`,
-        HttpStatus.NOT_FOUND
-      );
-      // throw new Error('Unable to find flow definition: ' + flowInstance.flowId);
-    }
+    // // const flowDefinition = findFlowDefinitionByBindId(flowInstance.flowId);
 
-    const module = flowRepository.getInteractiveModule(
-      flowInstance.flowDefinition.bindId
-    );
+    // if (!flowInstance) {
+    //   throw new HttpException(
+    //     `Unable to find flowInstance by id: ${flowInstanceId}`,
+    //     HttpStatus.NOT_FOUND
+    //   );
+    //   // throw new Error('Unable to find flow definition: ' + flowInstance.flowId);
+    // }
+
+    // Temporarily using a mock bindId
+    const mockBindId = 'mock-bind-id';
+    const module = flowRepository.getInteractiveModule(mockBindId);
+    // const module = flowRepository.getInteractiveModule(
+    //   flowInstance.flowDefinition.bindId
+    // );
 
     if (!module) {
       throw new Error(
-        'Unable to find module for flow definition: ' +
-          flowInstance.flowDefinition.bindId
+        'Unable to find module for flow definition: ' + mockBindId
       );
     }
 
@@ -97,24 +120,41 @@ export class FlowInstanceService {
       data: Record<string, IFlowDefinition> = {};
 
       async loadFlowDefinitionById(id: string): Promise<IFlowDefinition> {
-        if (!this.data[id]) {
-          const flowDef = await flowServiceLocal.getDefinitionById(id);
-          if (!flowDef) {
-            throw new Error(`No flow definition for id: ${id}`);
-          }
-          this.data[id] = flowDef;
-        }
-        return this.data[id];
+        // Temporarily returning mock data
+        return {
+          id: id,
+          bindId: 'mock-bind-id',
+          nodes: {},
+          createdAt: new Date().toISOString(),
+          version: '0.0.1'
+        };
+
+        // if (!this.data[id]) {
+        //   const flowDef = await flowServiceLocal.getDefinitionById(id);
+        //   if (!flowDef) {
+        //     throw new Error(`No flow definition for id: ${id}`);
+        //   }
+        //   this.data[id] = flowDef;
+        // }
+        // return this.data[id];
       }
     }
 
     const opts: InteractiveFlowContextOptions<any, string> = {
-      flowDefinitionId: flowInstance.flowDefinition.id,
+      flowDefinitionId: 'mock-flow-definition-id', // Temporarily using mock ID
       initialData: flowInstance.initialData,
       flowDefinitionRetriever: new FlowDefinitionRetriever(),
       interactiveFlowState: flowInstance,
       onUpdateInteractiveState: onUpdate,
     };
+
+    // Add a mock flowDefinition to the flowInstance
+    flowInstance.flowDefinition = {
+      id: 'mock-flow-definition-id',
+      bindId: mockBindId,
+      nodes: {},
+      createdAt: new Date().toISOString()
+    } as FlowDefinitionEntity;
 
     const activeSteps = await module.execute(opts, flowRepository);
 
@@ -128,21 +168,29 @@ export class FlowInstanceService {
     flowInstanceId: string,
     answer: { stepId: string; answer: IFlowStepAnswer }
   ) {
-    // const flowInstance = this.mockDbService.getFlowInstanceById(flowInstanceId);
-    const flowInstance = await this.flowInstanceRepo.findOne({
-      where: { id: flowInstanceId },
-    });
+    // Temporarily returning mock data
+    const flowInstance = new FlowInstanceEntity();
+    flowInstance.id = flowInstanceId;
+    flowInstance.answers = [];
+    flowInstance.initialData = {};
+    flowInstance.status = CQFlowExecutorStateEnum.Initiated;
+    flowInstance.actionsTaken = {};
 
-    if (!flowInstance) {
-      throw new HttpException(
-        `Unable to find flowInstance by id: ${flowInstanceId}`,
-        HttpStatus.NOT_FOUND
-      );
-    }
+    // const flowInstance = await this.flowInstanceRepo.findOne({
+    //   where: { id: flowInstanceId },
+    // });
+
+    // if (!flowInstance) {
+    //   throw new HttpException(
+    //     `Unable to find flowInstance by id: ${flowInstanceId}`,
+    //     HttpStatus.NOT_FOUND
+    //   );
+    // }
 
     flowInstance.answers.push(answer);
 
-    await this.flowInstanceRepo.save(flowInstance);
+    // Commenting out database save
+    // await this.flowInstanceRepo.save(flowInstance);
 
     // const nextFlowInstance = {
     //   ...flowInstance,
@@ -153,6 +201,8 @@ export class FlowInstanceService {
   }
 
   removeFlowInstanceById(flowInstanceId: string) {
-    return this.flowInstanceRepo.delete({ id: flowInstanceId });
+    // Temporarily returning a mock result
+    return { affected: 1, raw: {} };
+    // return this.flowInstanceRepo.delete({ id: flowInstanceId });
   }
 }

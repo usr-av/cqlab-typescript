@@ -5,6 +5,9 @@ import dts from 'vite-plugin-dts';
 import * as path from 'path';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
+// Read the package.json from the root directory
+const rootPackageJson = require('../../../package.json');
+
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../../node_modules/.vite/packages/ui/flow-renderer',

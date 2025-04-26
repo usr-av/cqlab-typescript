@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CQLab TypeScript</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .api-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .api-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .api-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .api-card h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .api-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .api-link:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: monospace;
+        }
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: #666;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>CQLab TypeScript</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Welcome to CQLab TypeScript</h2>
+            <p>This is a temporary UI for the CQLab TypeScript project. The full UI is under development, but the API server is running and can be accessed via the endpoints below.</p>
+        </div>
+
+        <h2>API Endpoints</h2>
+        <div class="api-section">
+            <div class="api-card">
+                <h3>Flow Definitions</h3>
+                <p>Manage clinical flow definitions</p>
+                <a href="/api/flows" class="api-link">GET /api/flows</a>
+            </div>
+
+            <div class="api-card">
+                <h3>Flow Implementations</h3>
+                <p>Access flow implementations</p>
+                <a href="/api/flow-implementations" class="api-link">Flow Implementations</a>
+            </div>
+
+            <div class="api-card">
+                <h3>Flow Instances</h3>
+                <p>Manage flow instances</p>
+                <a href="/api/flow-instances" class="api-link">Flow Instances</a>
+            </div>
+
+            <div class="api-card">
+                <h3>Libraries</h3>
+                <p>Access logic libraries</p>
+                <a href="/api/libraries/registry" class="api-link">Libraries Registry</a>
+            </div>
+
+            <div class="api-card">
+                <h3>Vocabulary</h3>
+                <p>Access medical vocabularies</p>
+                <a href="/api/vocabulary/value-sets" class="api-link">Value Sets</a>
+                <a href="/api/vocabulary/codes" class="api-link">Codes</a>
+            </div>
+
+            <div class="api-card">
+                <h3>Mock Data</h3>
+                <p>Access mock patient data</p>
+                <a href="/api/mock-data" class="api-link">Mock Data</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>API Usage Example</h2>
+            <p>Here's an example of how to use the API with JavaScript:</p>
+            <pre><code>fetch('/api/flows')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));</code></pre>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>CQLab TypeScript - A clinical quality language implementation in TypeScript</p>
+        </div>
+    </footer>
+</body>
+</html>

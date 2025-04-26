@@ -29,21 +29,22 @@ import { SeedDBService } from './routes/seed-db.service';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'cqlab-ui'),
+      rootPath: join(__dirname, '..', '..', '..', 'apps', 'cqlab-ui', 'src'),
     }),
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'cqlab-db.sqlite',
-      // host: 'localhost',
-      // port: 3306,
-      // username: 'root',
-      // password: 'root',
-      // database: 'test',
-      entities: [FlowDefinitionEntity, FlowInstanceEntity],
-      synchronize: true,
-    }),
+    // Temporarily commenting out TypeORM to bypass SQLite issues
+    // TypeOrmModule.forRoot({
+    //   type: 'sqlite',
+    //   database: ':memory:',
+    //   // host: 'localhost',
+    //   // port: 3306,
+    //   // username: 'root',
+    //   // password: 'root',
+    //   // database: 'test',
+    //   entities: [FlowDefinitionEntity, FlowInstanceEntity],
+    //   synchronize: true,
+    // }),
 
-    TypeOrmModule.forFeature([FlowDefinitionEntity, FlowInstanceEntity]),
+    // TypeOrmModule.forFeature([FlowDefinitionEntity, FlowInstanceEntity]),
   ],
   controllers: [
     FlowController,
